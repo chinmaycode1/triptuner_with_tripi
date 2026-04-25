@@ -1,0 +1,11 @@
+.profile-page { padding-bottom: 80px; }
+.profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 40px; padding: 48px 0; }
+.profile-sidebar { text-align: center; }
+.profile-avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--gradient-btn); color: white; font-size: 28px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+.profile-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.profile-email { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+.logout-btn { width: 100%; justify-content: center; }
+.profile-content { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 40px; }
+.profile-content h3 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+.profile-content .form-group { margin-bottom: 20px; }
+@media(max-width:768px) { .profile-layout { grid-template-columns: 1fr; } }

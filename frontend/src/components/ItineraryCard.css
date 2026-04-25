@@ -1,0 +1,146 @@
+/* Itinerary Card */
+.itin-card {
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+  height: 100%;
+}
+
+.itin-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.itin-card-image {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.itin-category-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.itin-card-content {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.itin-card-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.itin-emoji {
+  font-size: 40px;
+  flex-shrink: 0;
+}
+
+.itin-category {
+  margin-bottom: 6px;
+}
+
+.itin-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.itin-route {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.itin-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.itin-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.itin-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.itin-highlights li {
+  font-size: 13px;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.highlight-arrow {
+  color: var(--purple);
+  font-weight: 700;
+}
+
+.itin-budget {
+  background: var(--bg3);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.budget-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.budget-label {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.budget-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.budget-mid {
+  color: var(--primary);
+}
+
+.itin-view-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: auto;
+}

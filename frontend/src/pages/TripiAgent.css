@@ -1,0 +1,15 @@
+.tripi-page { height: calc(100vh - var(--nav-height)); overflow: hidden; }
+.tripi-layout { display: flex; height: 100%; }
+.tripi-sidebar { width: 280px; flex-shrink: 0; background: var(--bg2); border-right: 1px solid var(--border); padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; }
+.tripi-profile { text-align: center; }
+.tripi-avatar-large { width: 80px; height: 80px; border-radius: 50%; background: var(--gradient-btn); display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 12px; box-shadow: var(--shadow-glow); }
+.tripi-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.tripi-tagline { font-size: 13px; color: var(--text2); margin-bottom: 10px; }
+.tripi-status { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; color: var(--green); }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
+.quick-prompts h3 { font-size: 13px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.quick-prompt-btn { width: 100%; text-align: left; padding: 10px 14px; border-radius: var(--radius-md); background: var(--card); border: 1px solid var(--border); color: var(--text2); font-size: 13px; cursor: pointer; transition: var(--transition); margin-bottom: 6px; display: block; }
+.quick-prompt-btn:hover { background: var(--card2); color: var(--text); border-color: var(--purple); }
+.tripi-chat-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+@media(max-width:768px) { .tripi-sidebar { display: none; } }

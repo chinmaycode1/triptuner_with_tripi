@@ -1,0 +1,12 @@
+export const weekendGetaways = [
+  { id:"1",  name:"Lonavala",      fromCity:"Mumbai",     distance:83,  duration:"2D/1N", category:"Hills",    emoji:"🌊", description:"Scenic hill station with waterfalls, caves and the famous chikki sweet.", best_time:"Jun-Feb", avg_budget:3000 },
+  { id:"2",  name:"Pondicherry",   fromCity:"Chennai",    distance:162, duration:"2D/1N", category:"Beach",    emoji:"🇫🇷", description:"French colonial charm with pristine beaches and the spiritual Auroville.", best_time:"Oct-Mar", avg_budget:3500 },
+  { id:"3",  name:"Coorg",         fromCity:"Bangalore",  distance:250, duration:"3D/2N", category:"Hills",    emoji:"☕", description:"Coffee country with misty hills, waterfalls and rich Kodava culture.", best_time:"Oct-Mar", avg_budget:4000 },
+  { id:"4",  name:"Nainital",      fromCity:"Delhi",      distance:285, duration:"3D/2N", category:"Hills",    emoji:"🏔️", description:"Charming lake town in the Kumaon Himalayas with boating and trekking.", best_time:"Mar-Jun,Sep-Nov", avg_budget:3500 },
+  { id:"5",  name:"Mahabaleshwar", fromCity:"Pune",       distance:120, duration:"2D/1N", category:"Hills",    emoji:"🍓", description:"Strawberry capital of India with stunning viewpoints and pleasant weather.", best_time:"Feb-May,Sep-Nov", avg_budget:3000 },
+  { id:"6",  name:"Chikmagalur",   fromCity:"Bangalore",  distance:245, duration:"3D/2N", category:"Hills",    emoji:"☕", description:"Coffee hills with trekking, waterfalls and the famous Mullayanagiri peak.", best_time:"Sep-Mar", avg_budget:3500 },
+  { id:"7",  name:"Rishikesh",     fromCity:"Delhi",      distance:250, duration:"3D/2N", category:"Adventure",emoji:"��", description:"Yoga capital with white water rafting, bungee jumping and Ganga Aarti.", best_time:"Sep-Jun", avg_budget:2500 },
+  { id:"8",  name:"Mussoorie",     fromCity:"Delhi",      distance:290, duration:"3D/2N", category:"Hills",    emoji:"🏔️", description:"Queen of Hills with colonial charm, Kempty Falls and Lal Tibba viewpoint.", best_time:"Mar-Jun,Sep-Nov", avg_budget:3500 },
+  { id:"9",  name:"Kasauli",       fromCity:"Chandigarh", distance:45,  duration:"2D/1N", category:"Hills",    emoji:"🌲", description:"Quiet colonial hill station with pine forests and the Christ Church.", best_time:"Mar-Jun,Sep-Nov", avg_budget:2500 },
+  { id:"10", name:"Saputara",      fromCity:"Surat",      distance:165, duration:"2D/1N", category:"Hills",    emoji:"🌿", description:"Gujarat's only hill station with a scenic lake, tribal culture and waterfalls.", best_time:"Jun-Feb", avg_budget:2000 },
+];

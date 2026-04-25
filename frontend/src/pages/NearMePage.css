@@ -1,0 +1,17 @@
+.near-page { padding-bottom: 80px; }
+.near-hero { text-align: center; padding: 60px 0 40px; }
+.near-hero-icon { font-size: 64px; margin-bottom: 16px; }
+.location-status { color: var(--text2); margin-top: 16px; }
+.location-granted { margin-top: 16px; color: var(--green); }
+.location-coords { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.location-denied { color: var(--yellow); margin-top: 16px; font-size: 14px; }
+.getaways-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 24px; }
+.getaway-card { display: flex; gap: 20px; padding: 24px; cursor: pointer; }
+.getaway-emoji { font-size: 40px; flex-shrink: 0; }
+.getaway-body { flex: 1; }
+.getaway-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.getaway-header h3 { font-size: 18px; font-weight: 700; }
+.getaway-from { font-size: 13px; color: var(--purple); font-weight: 600; margin-bottom: 6px; }
+.getaway-desc { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
+.getaway-footer { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12px; color: var(--text3); }
+@media(max-width:768px) { .getaways-grid { grid-template-columns: 1fr; } .getaway-card { flex-direction: column; } }

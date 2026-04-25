@@ -1,0 +1,435 @@
+/* Itinerary Detail Page */
+.itinerary-detail-page {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+/* Hero Section */
+.itinerary-hero {
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.itinerary-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 40px;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateX(-4px);
+}
+
+.itinerary-hero-content {
+  color: white;
+}
+
+.itinerary-emoji-large {
+  font-size: 64px;
+  display: block;
+  margin-bottom: 16px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+}
+
+.itinerary-hero-title {
+  font-size: 48px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.itinerary-hero-route {
+  font-size: 20px;
+  margin-bottom: 16px;
+  opacity: 0.95;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.itinerary-hero-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 16px;
+}
+
+.itinerary-hero-meta .tag {
+  background: rgba(255,255,255,0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+}
+
+/* Stats Grid */
+.itinerary-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+  font-size: 32px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Tabs */
+.itinerary-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--primary);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Tab Content */
+.tab-content {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.itinerary-description {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.itinerary-description h2 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.itinerary-description p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text2);
+}
+
+/* Days Timeline */
+.days-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.day-card {
+  display: flex;
+  gap: 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+}
+
+.day-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transform: translateX(4px);
+}
+
+.day-number {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.day-content {
+  flex: 1;
+}
+
+.day-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.day-activities {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity {
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary);
+}
+
+.activity.stay {
+  border-left-color: var(--secondary);
+}
+
+.activity-time {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.activity p {
+  font-size: 14px;
+  color: var(--text2);
+  margin: 0;
+}
+
+.no-days-message {
+  text-align: center;
+  padding: 60px 20px;
+  background: var(--card-bg);
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+}
+
+.no-days-message p {
+  font-size: 16px;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+
+.no-days-message .btn {
+  margin-top: 16px;
+}
+
+/* Highlights Grid */
+.highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.highlight-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.highlight-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: var(--primary);
+}
+
+.highlight-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+/* Budget Table */
+.budget-table {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.budget-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.budget-row:last-child {
+  border-bottom: none;
+}
+
+.budget-header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: 700;
+}
+
+.budget-cell {
+  display: flex;
+  align-items: center;
+}
+
+.budget-highlight {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.budget-note {
+  background: #fff8e1;
+  border: 1px solid #ffd54f;
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: #f57c00;
+}
+
+.budget-note p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Action Buttons */
+.itinerary-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 60px 0 40px;
+}
+
+.btn-large {
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .itinerary-hero {
+    height: 300px;
+  }
+
+  .itinerary-hero-title {
+    font-size: 32px;
+  }
+
+  .itinerary-hero-route {
+    font-size: 16px;
+  }
+
+  .itinerary-emoji-large {
+    font-size: 48px;
+  }
+
+  .day-card {
+    flex-direction: column;
+  }
+
+  .day-number {
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+  }
+
+  .budget-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .budget-cell {
+    justify-content: space-between;
+  }
+
+  .budget-cell::before {
+    content: attr(data-label);
+    font-weight: 600;
+  }
+
+  .itinerary-actions {
+    flex-direction: column;
+  }
+
+  .btn-large {
+    width: 100%;
+  }
+}
