@@ -20,49 +20,111 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST /api/trips
+// POST /api/trips - Save PDF to storage and URL to database
 router.post('/', async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'Authentication required' });
+  
   try {
-    const tripData = {
-      user_id: req.user.id,
-      destination: req.body.destination,
-      state: req.body.state,
-      itinerary_text: req.body.itinerary_text,
-      itinerary_json: req.body.itinerary_json,
-      duration_days: req.body.duration_days,
-      budget_total: req.body.budget_total,
-      budget_per_person: req.body.budget_per_person,
-      group_size: req.body.group_size,
-      trip_type: req.body.trip_type,
-      travel_style: req.body.travel_style,
-      transport_mode: req.body.transport_mode,
-      accommodation_type: req.body.accommodation_type,
-      season: req.body.season,
-      interests: req.body.interests,
-    };
-    const { data, error } = await supabase.from('saved_trips').insert(tripData).select().single();
-    if (error) throw error;
+    console.log('Saving trip PDF for user:', req.user.id);
+    
+    const { destination, pdfBlob, filename } = req.body;
+    
+    if (!destination || !pdfBlob || !filename) {
+      return res.status(400).json({ error: 'destination, pdfBlob, and filename are required' });
+    }
 
-    // Increment total_trips_planned
-    await supabase.rpc('increment_trips_count', { user_id: req.user.id }).catch(() => {});
+    // Convert base64 PDF blob to buffer
+    const pdfBuffer = Buffer.from(pdfBlob, 'base64');
+    
+    // Upload PDF to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('trip-pdfs')
+      .upload(filename, pdfBuffer, {
+        contentType: 'application/pdf',
+        upsert: true
+      });
 
-    res.status(201).json({ trip: data });
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('trip-pdfs')
+      .getPublicUrl(filename);
+
+    if (!urlData?.publicUrl) {
+      throw new Error('Failed to get public URL');
+    }
+
+    // Save simple record to database
+    const { data, error } = await supabase
+      .from('saved_trips')
+      .insert({
+        user_id: req.user.id,
+        destination: destination,
+        pdf_url: urlData.publicUrl
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Database insert error:', error);
+      throw error;
+    }
+    
+    console.log('Trip saved successfully:', data);
+
+    res.status(201).json({ 
+      trip: data,
+      message: 'Trip saved and PDF stored successfully!'
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error saving trip:', err);
+    res.status(500).json({ 
+      error: err.message,
+      details: err.details || 'Unknown error'
+    });
   }
 });
 
-// DELETE /api/trips/:id
+// DELETE /api/trips/:id - Delete from database and storage
 router.delete('/:id', async (req, res) => {
   if (!req.user) return res.status(401).json({ error: 'Authentication required' });
   try {
+    // First get the trip to find the PDF filename
+    const { data: trip, error: fetchError } = await supabase
+      .from('saved_trips')
+      .select('pdf_url')
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Extract filename from URL
+    const filename = trip.pdf_url.split('/').pop();
+
+    // Delete from storage
+    const { error: storageError } = await supabase.storage
+      .from('trip-pdfs')
+      .remove([filename]);
+
+    if (storageError) {
+      console.warn('Storage delete warning:', storageError);
+      // Continue even if storage delete fails
+    }
+
+    // Delete from database
     const { error } = await supabase
       .from('saved_trips')
       .delete()
       .eq('id', req.params.id)
       .eq('user_id', req.user.id);
+
     if (error) throw error;
+
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

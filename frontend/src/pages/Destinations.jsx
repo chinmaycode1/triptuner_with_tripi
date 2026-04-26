@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { destinations } from '../data/destinations';
 import DestinationCard from '../components/DestinationCard';
 import './Destinations.css';
@@ -6,8 +7,10 @@ import './Destinations.css';
 const FILTERS = ['All India','Mountains','Beaches','Heritage','Wildlife','Spiritual','Adventure','Budget'];
 
 export default function Destinations() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All India');
   const [search, setSearch] = useState('');
+  const [generatedItinerary, setGeneratedItinerary] = useState(null);
 
   const filtered = useMemo(() => {
     let list = destinations;
@@ -28,6 +31,14 @@ export default function Destinations() {
     }
     return list;
   }, [activeFilter, search]);
+
+  const handleItineraryGenerate = (itineraryData) => {
+    setGeneratedItinerary(itineraryData);
+    // Scroll to itinerary section
+    setTimeout(() => {
+      document.getElementById('generated-itinerary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
 
   return (
     <main className="destinations-page" style={{ paddingTop: 'var(--nav-height)' }}>
@@ -65,7 +76,7 @@ export default function Destinations() {
         {filtered.length > 0 ? (
           <div className="grid-3">
             {filtered.map(dest => (
-              <DestinationCard key={dest.id} destination={dest} />
+              <DestinationCard key={dest.id} destination={dest} onItineraryGenerate={handleItineraryGenerate} />
             ))}
           </div>
         ) : (
@@ -77,6 +88,78 @@ export default function Destinations() {
               Clear Filters
             </button>
           </div>
+        )}
+
+        {/* Generated Itinerary Section */}
+        {generatedItinerary && (
+          <section id="generated-itinerary" className="itinerary-result-section" aria-label="Generated itinerary">
+            <div className="itinerary-result-card">
+              <div className="itinerary-header">
+                <div>
+                  <h2 className="section-title">✨ Your {generatedItinerary.destination} Itinerary</h2>
+                  <p className="section-subtitle">{generatedItinerary.duration} days • {generatedItinerary.category} • ₹{generatedItinerary.budget.toLocaleString('en-IN')} total</p>
+                </div>
+                <button 
+                  className="btn-close" 
+                  onClick={() => setGeneratedItinerary(null)}
+                  aria-label="Close itinerary"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {generatedItinerary.image && (
+                <div className="itinerary-image" style={{ backgroundImage: `url(${generatedItinerary.image})` }} />
+              )}
+              
+              <div className="itinerary-content">
+                <div 
+                  className="itinerary-text"
+                  dangerouslySetInnerHTML={{ 
+                    __html: generatedItinerary.itinerary
+                      .replace(/\n/g, '<br/>')
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  }} 
+                />
+              </div>
+              
+              <div className="itinerary-actions">
+                <button 
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    const { generateEnhancedItineraryPDF } = await import('../lib/enhancedPdf');
+                    await generateEnhancedItineraryPDF({
+                      title: `${generatedItinerary.destination} Trip`,
+                      destination: generatedItinerary.destination,
+                      state: generatedItinerary.state,
+                      duration: `${generatedItinerary.duration} Days`,
+                      groupSize: '2 people',
+                      category: generatedItinerary.category,
+                      emoji: '✈️',
+                      description: `A ${generatedItinerary.duration}-day trip to ${generatedItinerary.destination}`,
+                      budgetTotal: { mid: generatedItinerary.budget },
+                      budgetPerPerson: { mid: Math.round(generatedItinerary.budget / 2) },
+                      plan: generatedItinerary.itinerary,
+                    });
+                  }}
+                >
+                  📄 Download PDF
+                </button>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => navigate(`/tripi?q=Tell me more about ${generatedItinerary.destination}`)}
+                >
+                  💬 Chat with Tripi
+                </button>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => navigate(`/plan?destination=${generatedItinerary.destination}`)}
+                >
+                  ✏️ Customize Trip
+                </button>
+              </div>
+            </div>
+          </section>
         )}
       </div>
     </main>

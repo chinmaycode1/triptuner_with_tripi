@@ -38,6 +38,19 @@ export default function SavedTrips() {
     }
   };
 
+  const handleViewPDF = (pdfUrl) => {
+    window.open(pdfUrl, '_blank');
+  };
+
+  const handleDownloadPDF = (pdfUrl, destination) => {
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `${destination.replace(/[^a-zA-Z0-9]/g, '-')}-itinerary.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (authLoading || loading) {
     return (
       <main style={{ paddingTop: 'var(--nav-height)' }}>
@@ -54,7 +67,7 @@ export default function SavedTrips() {
       <div className="container">
         <div className="page-header">
           <h1 className="section-title">💾 Saved Trips</h1>
-          <p className="section-subtitle">Your personalized India travel plans</p>
+          <p className="section-subtitle">Your personalized India travel plans stored as PDFs</p>
         </div>
 
         {trips.length === 0 ? (
@@ -79,14 +92,26 @@ export default function SavedTrips() {
                   </button>
                 </div>
                 <div className="saved-trip-meta">
-                  <span>⏱️ {trip.duration_days} days</span>
-                  <span>👥 {trip.group_size} people</span>
-                  <span>💰 ₹{Number(trip.budget_total).toLocaleString('en-IN')}</span>
+                  <span>📄 PDF Itinerary</span>
+                  <span>📅 {new Date(trip.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}</span>
                 </div>
-                {trip.trip_type && <span className="tag">{trip.trip_type}</span>}
                 <p className="saved-trip-date">
                   Saved {new Date(trip.created_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })}
                 </p>
+                <div className="saved-trip-actions">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleViewPDF(trip.pdf_url)}
+                  >
+                    👁️ View PDF
+                  </button>
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => handleDownloadPDF(trip.pdf_url, trip.destination)}
+                  >
+                    📥 Download
+                  </button>
+                </div>
                 <button
                   className="btn btn-secondary saved-trip-chat-btn"
                   onClick={() => navigate(`/tripi?q=Tell me more about my trip to ${trip.destination}`)}

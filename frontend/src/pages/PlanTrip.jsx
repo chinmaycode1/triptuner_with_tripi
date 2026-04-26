@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { generateTrip, saveTrip } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/Toast';
 import { destinationNames } from '../data/destinations';
+import { generateItineraryPDF } from '../lib/enhancedPdf';
 import './PlanTrip.css';
 
 const INTERESTS = ['Sightseeing','Trekking','Beach','Food','Spiritual','Wildlife','Photography','Shopping'];
@@ -11,15 +12,35 @@ const INTERESTS = ['Sightseeing','Trekking','Beach','Food','Spiritual','Wildlife
 export default function PlanTrip() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
-    destination: '', tripType: 'Solo Adventure', duration: 5,
-    style: 'Mid-range Comfort', groupSize: 2, budget: 25000,
-    accommodation: 'Mid-range Hotel', transport: 'Public Transport',
-    season: 'Winter (Oct-Feb)', interests: [],
+    destination: searchParams.get('destination') || '', 
+    tripType: 'Solo Adventure', 
+    duration: 5,
+    style: 'Mid-range Comfort', 
+    groupSize: 2, 
+    budget: 25000,
+    accommodation: 'Mid-range Hotel', 
+    transport: 'Public Transport',
+    season: 'Winter (Oct-Feb)', 
+    interests: [],
   });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [errors, setErrors] = useState({});
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+
+  // Auto-generate if destination is provided
+  useEffect(() => {
+    const dest = searchParams.get('destination');
+    if (dest && dest.trim()) {
+      setForm(prev => ({ ...prev, destination: dest }));
+      // Auto-generate after a short delay
+      setTimeout(() => {
+        handleGenerate(null, dest);
+      }, 500);
+    }
+  }, [searchParams]);
 
   const validate = () => {
     const e = {};
@@ -37,14 +58,14 @@ export default function PlanTrip() {
     }));
   };
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
+  const handleGenerate = async (e, destinationOverride = null) => {
+    if (e) e.preventDefault();
     if (!validate()) return;
     setLoading(true);
     setResult(null);
     try {
       const data = await generateTrip({
-        destination: form.destination,
+        destination: destinationOverride || form.destination,
         days: form.duration,
         groupSize: form.groupSize,
         budget: form.budget,
@@ -64,26 +85,61 @@ export default function PlanTrip() {
     }
   };
 
-  const handleSave = async () => {
-    if (!user) { showToast('Please log in to save trips', 'warning'); return; }
+  const handleDownloadPDF = async () => {
+    if (!result) return;
+    setDownloadingPDF(true);
     try {
-      await saveTrip({
+      await generateItineraryPDF({
         destination: form.destination,
-        itinerary_text: result?.plan,
-        duration_days: form.duration,
-        budget_total: form.budget,
-        budget_per_person: Math.round(form.budget / form.groupSize),
-        group_size: form.groupSize,
-        trip_type: form.tripType,
-        travel_style: form.style,
-        transport_mode: form.transport,
-        accommodation_type: form.accommodation,
+        duration: form.duration,
+        groupSize: form.groupSize,
+        budget: form.budget,
+        budgetPerPerson: Math.round(form.budget / form.groupSize),
+        tripType: form.tripType,
+        style: form.style,
+        transport: form.transport,
+        accommodation: form.accommodation,
         season: form.season,
         interests: form.interests,
+        itinerary: result.plan || '',
       });
-      showToast('Trip saved! ✅', 'success');
+      showToast('PDF downloaded! 📄', 'success');
     } catch (err) {
-      showToast('Failed to save trip', 'error');
+      console.error('PDF generation error:', err);
+      showToast('Failed to generate PDF', 'error');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) { 
+      showToast('Please log in to save trips', 'warning'); 
+      return; 
+    }
+    
+    if (!result || !result.plan) {
+      showToast('Please generate an itinerary first', 'warning');
+      return;
+    }
+    
+    try {
+      const { saveItineraryAsPDF, extractTripData } = await import('../lib/saveTripPDF');
+      
+      const tripData = extractTripData({
+        destination: form.destination,
+        plan: result.plan,
+        duration: form.duration,
+        groupSize: form.groupSize,
+        budget: form.budget,
+        budgetPerPerson: Math.round(form.budget / form.groupSize),
+        tripType: form.tripType
+      }, 'form');
+      
+      await saveItineraryAsPDF(tripData);
+    } catch (err) {
+      console.error('Save trip error:', err);
+      showToast(`Failed to save trip: ${err.message}`, 'error');
     }
   };
 
@@ -215,9 +271,11 @@ export default function PlanTrip() {
               </div>
               <div className="result-plan" dangerouslySetInnerHTML={{ __html: (result.plan || '').replace(/\n/g,'<br/>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>') }} />
               <div className="result-actions">
-                <button className="btn btn-primary" onClick={handleSave}>💾 Save Trip</button>
+                <button className="btn btn-primary" onClick={handleDownloadPDF} disabled={downloadingPDF}>
+                  {downloadingPDF ? '⏳ Generating PDF...' : '📄 Download PDF'}
+                </button>
+                <button className="btn btn-secondary" onClick={handleSave}>💾 Save Trip</button>
                 <button className="btn btn-secondary" onClick={() => navigate(`/tripi?q=Tell me more about ${form.destination}`)}>💬 Chat with Tripi</button>
-                <button className="btn btn-secondary" onClick={() => window.print()}>🖨️ Print</button>
               </div>
             </div>
           )}

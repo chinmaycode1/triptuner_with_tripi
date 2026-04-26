@@ -11,3 +11,117 @@
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
 .empty-state h3 { font-size: 22px; margin-bottom: 8px; }
 .empty-state p { color: var(--text2); margin-bottom: 24px; }
+
+/* Itinerary Result Section */
+.itinerary-result-section {
+  padding: 60px 0;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+
+.itinerary-result-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-lg);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.itinerary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.itinerary-header .section-title {
+  margin-bottom: 8px;
+}
+
+.itinerary-header .section-subtitle {
+  color: var(--text2);
+  font-size: 14px;
+}
+
+.btn-close {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 20px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-close:hover {
+  background: var(--bg2);
+  color: var(--text);
+  transform: scale(1.05);
+}
+
+.itinerary-image {
+  width: 100%;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius-lg);
+  margin-bottom: 24px;
+}
+
+.itinerary-content {
+  margin-bottom: 32px;
+}
+
+.itinerary-text {
+  color: var(--text);
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.itinerary-text strong {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.itinerary-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.itinerary-actions .btn {
+  flex: 1;
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .itinerary-result-card {
+    padding: 24px;
+  }
+  
+  .itinerary-header {
+    flex-direction: column;
+  }
+  
+  .btn-close {
+    align-self: flex-end;
+  }
+  
+  .itinerary-actions {
+    flex-direction: column;
+  }
+  
+  .itinerary-actions .btn {
+    width: 100%;
+  }
+}

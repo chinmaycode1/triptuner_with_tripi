@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBudgetClass } from '../data/destinations';
+import { generateTrip } from '../lib/api';
+import { generateItineraryPDF } from '../lib/enhancedPdf';
+import { showToast } from './Toast';
 import './DestinationCard.css';
 
 const CURRENT_MONTH = new Date().getMonth();
@@ -22,13 +26,14 @@ function isInSeason(best_time) {
   return false;
 }
 
-export default function DestinationCard({ destination, skeleton = false }) {
+export default function DestinationCard({ destination, skeleton = false, onItineraryGenerate }) {
   const navigate = useNavigate();
+  const [generating, setGenerating] = useState(false);
 
   if (skeleton) {
     return (
       <div className="dest-card skeleton-card" aria-hidden="true">
-        <div className="skeleton dest-card-emoji-area" />
+        <div className="skeleton dest-card-image-area" />
         <div className="dest-card-body">
           <div className="skeleton" style={{height:'20px',width:'60%',marginBottom:'8px'}} />
           <div className="skeleton" style={{height:'14px',width:'40%',marginBottom:'12px'}} />
@@ -38,25 +43,59 @@ export default function DestinationCard({ destination, skeleton = false }) {
     );
   }
 
-  const { name, state, emoji, best_time, avg_budget_per_day, category, description } = destination;
+  const { name, state, emoji, image, best_time, avg_budget_per_day, category, description } = destination;
   const budgetClass = getBudgetClass(avg_budget_per_day);
   const inSeason = isInSeason(best_time);
 
-  const handleClick = () => {
-    navigate(`/tripi?q=Plan a ${category[0].toLowerCase()} trip to ${name}, ${state}`);
+  const handleGenerateItinerary = async (e) => {
+    e.stopPropagation();
+    setGenerating(true);
+    
+    try {
+      const data = await generateTrip({
+        destination: name,
+        days: 5,
+        groupSize: 2,
+        budget: avg_budget_per_day * 5 * 2,
+        tripType: 'Leisure Trip',
+        style: 'Mid-range Comfort',
+        transport: 'Public Transport',
+        accommodation: 'Mid-range Hotel',
+        season: best_time,
+        interests: category,
+      });
+      
+      // Call parent component to show itinerary
+      if (onItineraryGenerate) {
+        onItineraryGenerate({
+          destination: name,
+          state,
+          itinerary: data.plan,
+          duration: 5,
+          budget: avg_budget_per_day * 5 * 2,
+          budgetPerDay: avg_budget_per_day,
+          category: category[0],
+          image
+        });
+      }
+      
+      showToast('Itinerary generated! 🎉', 'success');
+    } catch (err) {
+      showToast('Failed to generate itinerary', 'error');
+    } finally {
+      setGenerating(false);
+    }
   };
 
   return (
     <article
       className="dest-card card"
-      onClick={handleClick}
       role="button"
       tabIndex={0}
-      onKeyDown={e => e.key === 'Enter' && handleClick()}
       aria-label={`Explore ${name}, ${state}`}
     >
-      <div className="dest-card-emoji-area">
-        <span className="dest-emoji" role="img" aria-label={name}>{emoji}</span>
+      <div className="dest-card-image-area">
+        <img src={image} alt={name} className="dest-image" loading="lazy" />
         {inSeason && <span className="season-badge" title="Great time to visit!">🌟 In Season</span>}
       </div>
       <div className="dest-card-body">
@@ -72,6 +111,13 @@ export default function DestinationCard({ destination, skeleton = false }) {
           <span className="tag">{category[0]}</span>
         </div>
         <div className="dest-best-time">🗓️ Best: {best_time}</div>
+        <button 
+          className="btn btn-primary dest-plan-btn"
+          onClick={handleGenerateItinerary}
+          disabled={generating}
+        >
+          {generating ? '⏳ Generating...' : '✨ Get Itinerary'}
+        </button>
       </div>
     </article>
   );

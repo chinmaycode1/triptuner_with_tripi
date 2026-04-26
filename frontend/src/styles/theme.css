@@ -13,10 +13,14 @@
   --accent2: #ff9f1c;
   --teal: #00d4aa;
   --purple: #7c5cfc;
+  --purple-light: rgba(124, 92, 252, 0.15);
   --pink: #ff4d8d;
   --green: #22c55e;
   --red: #ef4444;
   --yellow: #f59e0b;
+  --blue: #3b82f6;
+  --blue-light: rgba(59, 130, 246, 0.15);
+  --card-bg: var(--card);
   --gradient-hero: linear-gradient(135deg,#7c5cfc 0%,#ff4d8d 50%,#ff6b35 100%);
   --gradient-btn: linear-gradient(135deg,#7c5cfc,#ff4d8d);
   --gradient-btn-hover: linear-gradient(135deg,#6a4de8,#e8356e);

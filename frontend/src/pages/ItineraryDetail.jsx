@@ -2,14 +2,18 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { itineraries } from '../data/itineraries';
 import { generateEnhancedItineraryPDF } from '../lib/pdf';
+import { saveTrip } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { showToast } from '../components/Toast';
 import './ItineraryDetail.css';
 
 export default function ItineraryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [itinerary, setItinerary] = useState(null);
   const [activeTab, setActiveTab] = useState('itinerary');
+  const [savingTrip, setSavingTrip] = useState(false);
 
   useEffect(() => {
     const found = itineraries.find(i => i.id === id);
@@ -29,6 +33,57 @@ export default function ItineraryDetail() {
     } catch (err) {
       console.error('PDF generation error:', err);
       showToast('Failed to generate PDF', 'error');
+    }
+  };
+
+  const handleSaveTrip = async () => {
+    if (!user) {
+      showToast('Please log in to save trips', 'warning');
+      return;
+    }
+
+    setSavingTrip(true);
+    try {
+      const { saveItineraryAsPDF, extractTripData } = await import('../lib/saveTripPDF');
+      
+      // Convert days array to text format
+      let itineraryText = `${title}\n\n${description}\n\n`;
+      
+      if (days && days.length > 0) {
+        days.forEach(day => {
+          itineraryText += `Day ${day.day}: ${day.title}\n`;
+          itineraryText += `Morning: ${day.morning}\n`;
+          itineraryText += `Afternoon: ${day.afternoon}\n`;
+          itineraryText += `Evening: ${day.evening}\n`;
+          itineraryText += `Stay: ${day.stay}\n\n`;
+        });
+      }
+
+      // Extract duration number (e.g., "7 Days" -> 7)
+      const durationMatch = duration.match(/(\d+)/);
+      const durationDays = durationMatch ? parseInt(durationMatch[1]) : 7;
+
+      // Extract group size number
+      const groupSizeMatch = groupSize.match(/(\d+)/);
+      const groupSizeNum = groupSizeMatch ? parseInt(groupSizeMatch[1]) : 2;
+
+      const tripData = {
+        destination: title.split(':')[0].trim(),
+        itinerary: itineraryText,
+        duration: durationDays,
+        groupSize: groupSizeNum,
+        budget: budgetTotal?.mid || 50000,
+        budgetPerPerson: budgetPerPerson?.mid || 25000,
+        category: category,
+        state: route.split('-')[0].trim()
+      };
+
+      await saveItineraryAsPDF(tripData);
+    } catch (err) {
+      console.error('Save trip error:', err);
+      showToast(`Failed to save trip: ${err.message}`, 'error');
+    } finally {
+      setSavingTrip(false);
     }
   };
 
@@ -216,8 +271,16 @@ export default function ItineraryDetail() {
 
         {/* Action Buttons */}
         <div className="itinerary-actions">
-          <button className="btn btn-primary btn-large" onClick={handleDownloadPDF}>
-            📥 Download Professional PDF
+          <button 
+            className="btn btn-primary btn-large" 
+            onClick={handleSaveTrip}
+            disabled={savingTrip || !user}
+            title={!user ? 'Please log in to save trips' : 'Save this trip'}
+          >
+            {savingTrip ? '⏳ Saving...' : '💾 Save Trip'}
+          </button>
+          <button className="btn btn-secondary btn-large" onClick={handleDownloadPDF}>
+            📥 Download PDF
           </button>
           <button className="btn btn-secondary btn-large" onClick={() => navigate(`/tripi?q=Tell me more about ${title}`)}>
             💬 Chat with Tripi AI

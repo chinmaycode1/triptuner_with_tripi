@@ -24,6 +24,7 @@ export default function Home({ onAuthOpen }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ destination: '', members: 'Solo', duration: '5' });
   const [statsVisible, setStatsVisible] = useState(false);
+  const [generatedItinerary, setGeneratedItinerary] = useState(null);
   const statsRef = useRef(null);
 
   const destinations500 = useCounter(500, 2000, statsVisible);
@@ -47,6 +48,14 @@ export default function Home({ onAuthOpen }) {
   };
 
   const featured = getFeaturedDestinations().slice(0, 6);
+
+  const handleItineraryGenerate = (itineraryData) => {
+    setGeneratedItinerary(itineraryData);
+    // Scroll to itinerary section
+    setTimeout(() => {
+      document.getElementById('generated-itinerary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
 
   return (
     <main className="home-page">
@@ -136,7 +145,7 @@ export default function Home({ onAuthOpen }) {
           <p className="section-subtitle">Handpicked by Tripi AI for unforgettable experiences</p>
           <div className="grid-3">
             {featured.map(dest => (
-              <DestinationCard key={dest.id} destination={dest} />
+              <DestinationCard key={dest.id} destination={dest} onItineraryGenerate={handleItineraryGenerate} />
             ))}
           </div>
           <div className="view-all-row">
@@ -146,6 +155,94 @@ export default function Home({ onAuthOpen }) {
           </div>
         </div>
       </section>
+
+      {/* Generated Itinerary Section */}
+      {generatedItinerary && (
+        <section id="generated-itinerary" className="section itinerary-result-section" aria-label="Generated itinerary">
+          <div className="container">
+            <div className="itinerary-result-card">
+              <div className="itinerary-header">
+                <div>
+                  <h2 className="section-title">✨ Your {generatedItinerary.destination} Itinerary</h2>
+                  <p className="section-subtitle">{generatedItinerary.duration} days • {generatedItinerary.category} • ₹{generatedItinerary.budget.toLocaleString('en-IN')} total</p>
+                </div>
+                <button 
+                  className="btn-close" 
+                  onClick={() => setGeneratedItinerary(null)}
+                  aria-label="Close itinerary"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              {generatedItinerary.image && (
+                <div className="itinerary-image" style={{ backgroundImage: `url(${generatedItinerary.image})` }} />
+              )}
+              
+              <div className="itinerary-content">
+                <div 
+                  className="itinerary-text"
+                  dangerouslySetInnerHTML={{ 
+                    __html: generatedItinerary.itinerary
+                      .replace(/\n/g, '<br/>')
+                      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                  }} 
+                />
+              </div>
+              
+              <div className="itinerary-actions">
+                <button 
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    const { saveItineraryAsPDF, extractTripData } = await import('../lib/saveTripPDF');
+                    try {
+                      const tripData = extractTripData(generatedItinerary, 'generated');
+                      await saveItineraryAsPDF(tripData);
+                    } catch (err) {
+                      console.error('Save error:', err);
+                    }
+                  }}
+                >
+                  💾 Save Trip
+                </button>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={async () => {
+                    const { generateEnhancedItineraryPDF } = await import('../lib/enhancedPdf');
+                    await generateEnhancedItineraryPDF({
+                      title: `${generatedItinerary.destination} Trip`,
+                      destination: generatedItinerary.destination,
+                      state: generatedItinerary.state,
+                      duration: `${generatedItinerary.duration} Days`,
+                      groupSize: '2 people',
+                      category: generatedItinerary.category,
+                      emoji: '✈️',
+                      description: `A ${generatedItinerary.duration}-day trip to ${generatedItinerary.destination}`,
+                      budgetTotal: { mid: generatedItinerary.budget },
+                      budgetPerPerson: { mid: Math.round(generatedItinerary.budget / 2) },
+                      plan: generatedItinerary.itinerary,
+                    });
+                  }}
+                >
+                  📄 Download PDF
+                </button>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => navigate(`/tripi?q=Tell me more about ${generatedItinerary.destination}`)}
+                >
+                  💬 Chat with Tripi
+                </button>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => navigate(`/plan?destination=${generatedItinerary.destination}`)}
+                >
+                  ✏️ Customize Trip
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Tripi CTA */}
       <section className="tripi-cta-section section" aria-label="Tripi AI call to action">

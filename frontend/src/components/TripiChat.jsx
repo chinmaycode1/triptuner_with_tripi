@@ -1,6 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import { chatWithTripi } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import { chatWithTripi, saveTrip } from '../lib/api';
+import { 
+  createConversation, 
+  saveMessage, 
+  getConversationMessages 
+} from '../lib/chatHistory';
 import { showToast } from './Toast';
+import { generateItineraryPDF } from '../lib/enhancedPdf';
 import './TripiChat.css';
 
 const QUICK_PROMPTS = [
@@ -21,7 +28,9 @@ const NAMASTE_RESPONSES = {
   mr: "🙏 नमस्कार! मी Tripi आहे, तुमचा AI Travel Architect! पारंपारिक भारतीय पद्धतीने अभिवादन केल्याबद्दल धन्यवाद! आज मी तुमच्या भारत प्रवासाची योजना करण्यात कशी मदत करू शकतो?",
 };
 
-export default function TripiChat({ initialQuery = '', language = 'en' }) {
+export default function TripiChat({ initialQuery = '', language = 'en', conversationId: propConversationId = null }) {
+  const { user } = useAuth();
+  const [conversationId, setConversationId] = useState(propConversationId);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -30,8 +39,39 @@ export default function TripiChat({ initialQuery = '', language = 'en' }) {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [savingTrip, setSavingTrip] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+
+  // Load conversation history if conversationId is provided
+  useEffect(() => {
+    if (conversationId && user) {
+      loadConversationHistory();
+    }
+  }, [conversationId, user]);
+
+  const loadConversationHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      const { data, error } = await getConversationMessages(conversationId);
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Replace messages with loaded history
+        setMessages(data.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        })));
+      }
+    } catch (error) {
+      console.error('Error loading conversation history:', error);
+      showToast('Failed to load conversation history', 'error');
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
 
   useEffect(() => {
     if (initialQuery) {
@@ -51,32 +91,88 @@ export default function TripiChat({ initialQuery = '', language = 'en' }) {
     // Easter egg: namaste
     if (userText.toLowerCase() === 'namaste') {
       const response = NAMASTE_RESPONSES[language] || NAMASTE_RESPONSES.en;
-      setMessages(prev => [
-        ...prev,
+      const newMessages = [
         { role: 'user', content: userText },
         { role: 'assistant', content: response }
-      ]);
+      ];
+      
+      setMessages(prev => [...prev, ...newMessages]);
       setInput('');
+      
+      // Save to database if user is logged in
+      if (user) {
+        await saveMessagesToDatabase(newMessages);
+      }
       return;
     }
 
-    const newMessages = [...messages, { role: 'user', content: userText }];
+    const userMessage = { role: 'user', content: userText };
+    const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
     setLoading(true);
 
+    // Save user message to database if logged in
+    if (user) {
+      await saveMessagesToDatabase([userMessage]);
+    }
+
     try {
       const last20 = newMessages.slice(-20);
       const { reply } = await chatWithTripi(last20, language);
-      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+      const assistantMessage = { role: 'assistant', content: reply };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      // Save assistant message to database if logged in
+      if (user) {
+        await saveMessagesToDatabase([assistantMessage]);
+      }
     } catch (err) {
       showToast('Failed to get response. Check your connection.', 'error');
-      setMessages(prev => [...prev, {
+      const errorMessage = {
         role: 'assistant',
         content: "Sorry, I'm having trouble connecting right now. Please try again in a moment! 🙏"
-      }]);
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      
+      // Save error message to database if logged in
+      if (user) {
+        await saveMessagesToDatabase([errorMessage]);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveMessagesToDatabase = async (messagesToSave) => {
+    if (!user) return;
+
+    try {
+      // Create conversation if it doesn't exist
+      let currentConversationId = conversationId;
+      
+      if (!currentConversationId) {
+        const { data, error } = await createConversation(user.id);
+        if (error) throw error;
+        currentConversationId = data.id;
+        setConversationId(currentConversationId);
+      }
+
+      // Save each message
+      for (const message of messagesToSave) {
+        const { error } = await saveMessage(
+          currentConversationId,
+          user.id,
+          message.role,
+          message.content
+        );
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Error saving messages to database:', error);
+      // Don't show error toast to avoid interrupting user experience
+      // Messages are still shown in UI even if save fails
     }
   };
 
@@ -94,18 +190,144 @@ export default function TripiChat({ initialQuery = '', language = 'en' }) {
       .replace(/\n/g, '<br/>');
   };
 
+  // Extract trip details from assistant message
+  const extractTripDetails = (content) => {
+    const details = {
+      destination: '',
+      duration_days: 5,
+      budget_total: 25000,
+      group_size: 2,
+      trip_type: 'Adventure',
+      interests: []
+    };
+
+    // Extract destination (look for common patterns)
+    const destMatch = content.match(/(?:trip to|visit|explore|plan.*?(?:to|for))\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+    if (destMatch) details.destination = destMatch[1];
+
+    // Extract duration
+    const daysMatch = content.match(/(\d+)[\s-]*(?:day|days)/i);
+    if (daysMatch) details.duration_days = parseInt(daysMatch[1]);
+
+    // Extract budget
+    const budgetMatch = content.match(/₹\s*([0-9,]+)/);
+    if (budgetMatch) details.budget_total = parseInt(budgetMatch[1].replace(/,/g, ''));
+
+    // Extract group size
+    const groupMatch = content.match(/(\d+)\s*(?:people|person|pax|travelers)/i);
+    if (groupMatch) details.group_size = parseInt(groupMatch[1]);
+
+    return details;
+  };
+
+  // Check if message contains an itinerary
+  const isItinerary = (content) => {
+    const itineraryKeywords = ['day 1', 'day 2', 'itinerary', 'schedule', 'morning:', 'afternoon:', 'evening:'];
+    const lowerContent = content.toLowerCase();
+    return itineraryKeywords.some(keyword => lowerContent.includes(keyword));
+  };
+
+  const handleSaveItinerary = async (messageIndex) => {
+    if (!user) {
+      showToast('Please log in to save trips', 'warning');
+      return;
+    }
+
+    const message = messages[messageIndex];
+    if (!message || message.role !== 'assistant') return;
+
+    setSavingTrip(true);
+    try {
+      const { saveItineraryAsPDF, extractTripData } = await import('../lib/saveTripPDF');
+      
+      const tripData = extractTripData(message.content, 'chat');
+      await saveItineraryAsPDF(tripData);
+    } catch (err) {
+      console.error('Save trip error:', err);
+      showToast(`Failed to save trip: ${err.message}`, 'error');
+    } finally {
+      setSavingTrip(false);
+    }
+  };
+
+  const handleDownloadPDF = async (messageIndex) => {
+    const message = messages[messageIndex];
+    if (!message || message.role !== 'assistant') return;
+
+    setDownloadingPDF(true);
+    try {
+      const tripDetails = extractTripDetails(message.content);
+      
+      await generateItineraryPDF({
+        destination: tripDetails.destination || 'India Trip',
+        duration: tripDetails.duration_days,
+        groupSize: tripDetails.group_size,
+        budget: tripDetails.budget_total,
+        budgetPerPerson: Math.round(tripDetails.budget_total / tripDetails.group_size),
+        tripType: tripDetails.trip_type,
+        style: 'Mid-range Comfort',
+        transport: 'Public Transport',
+        accommodation: 'Mid-range Hotel',
+        season: 'Winter (Oct-Feb)',
+        interests: tripDetails.interests,
+        itinerary: message.content,
+      });
+      
+      showToast('PDF downloaded! 📄', 'success');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      showToast('Failed to generate PDF', 'error');
+    } finally {
+      setDownloadingPDF(false);
+    }
+  };
+
   return (
     <div className="tripi-chat">
+      {loadingHistory && (
+        <div className="loading-history">
+          <div className="loading-spinner"></div>
+          <p>Loading conversation history...</p>
+        </div>
+      )}
+      
       <div className="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
+        {!user && messages.length > 1 && (
+          <div className="chat-notice">
+            <p>💡 <strong>Tip:</strong> Sign in to save your chat history and access it from any device!</p>
+          </div>
+        )}
+        
         {messages.map((msg, i) => (
           <div key={i} className={`chat-message ${msg.role}`}>
             {msg.role === 'assistant' && (
               <div className="tripi-avatar" aria-hidden="true">🧭</div>
             )}
-            <div
-              className="message-bubble"
-              dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
-            />
+            <div className="message-content-wrapper">
+              <div
+                className="message-bubble"
+                dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }}
+              />
+              {msg.role === 'assistant' && isItinerary(msg.content) && (
+                <div className="message-actions">
+                  <button
+                    className="btn btn-small btn-primary"
+                    onClick={() => handleSaveItinerary(i)}
+                    disabled={savingTrip || !user}
+                    title={!user ? 'Please log in to save trips' : 'Save this itinerary'}
+                  >
+                    {savingTrip ? '⏳ Saving...' : '💾 Save Trip'}
+                  </button>
+                  <button
+                    className="btn btn-small btn-secondary"
+                    onClick={() => handleDownloadPDF(i)}
+                    disabled={downloadingPDF}
+                  >
+                    {downloadingPDF ? '⏳ Generating...' : '📄 Download PDF'}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         ))}
         {loading && (
@@ -129,12 +351,12 @@ export default function TripiChat({ initialQuery = '', language = 'en' }) {
           onKeyDown={handleKeyDown}
           rows={2}
           aria-label="Message input"
-          disabled={loading}
+          disabled={loading || loadingHistory}
         />
         <button
           className="chat-send-btn"
           onClick={() => sendMessage()}
-          disabled={loading || !input.trim()}
+          disabled={loading || loadingHistory || !input.trim()}
           aria-label="Send message"
         >
           {loading ? '⏳' : '🚀'}

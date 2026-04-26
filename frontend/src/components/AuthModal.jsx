@@ -26,13 +26,31 @@ export default function AuthModal({ mode, onClose }) {
     try {
       if (tab === 'login') {
         const { error } = await signIn(form.email, form.password);
-        if (error) throw error;
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            throw new Error('Invalid email or password. Please try again.');
+          } else if (error.message.includes('Email not confirmed')) {
+            throw new Error('Please verify your email before logging in. Check your inbox.');
+          }
+          throw error;
+        }
         showToast('Welcome back! 🎉', 'success');
         onClose();
       } else {
-        const { error } = await signUp(form.email, form.password, form.fullName);
-        if (error) throw error;
-        showToast('Account created! Check your email to verify. ✅', 'success');
+        const { data, error } = await signUp(form.email, form.password, form.fullName);
+        if (error) {
+          if (error.message.includes('already registered')) {
+            throw new Error('This email is already registered. Please log in instead.');
+          }
+          throw error;
+        }
+        
+        // Check if email confirmation is required
+        if (data?.user && !data.session) {
+          showToast('Account created! Please check your email to verify your account. ✅', 'success');
+        } else {
+          showToast('Account created and logged in! 🎉', 'success');
+        }
         onClose();
       }
     } catch (err) {
