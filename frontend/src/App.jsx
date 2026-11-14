@@ -15,6 +15,8 @@ import PlanTrip from './pages/PlanTrip';
 import NearMePage from './pages/NearMePage';
 import SavedTrips from './pages/SavedTrips';
 import Profile from './pages/Profile';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import './styles/globals.css';
 
 export default function App() {
@@ -53,11 +55,13 @@ export default function App() {
             <Route path="/near-me" element={<NearMePage />} />
             <Route path="/saved" element={<SavedTrips />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="*" element={
               <div style={{ paddingTop: 'var(--nav-height)', textAlign: 'center', padding: '120px 24px' }}>
-                <div style={{ fontSize: '64px', marginBottom: '16px' }}>✈️</div>
-                <h1 style={{ marginBottom: '12px' }}>Page Not Found</h1>
-                <p style={{ color: 'var(--text2)', marginBottom: '24px' }}>This destination doesn't exist on our map!</p>
+                <h1 style={{ fontSize: '64px', marginBottom: '16px' }}>404</h1>
+                <p style={{ fontSize: '20px', marginBottom: '12px' }}>Page Not Found</p>
+                <p style={{ color: 'var(--text2)', marginBottom: '24px' }}>This destination does not exist on our map.</p>
                 <a href="/" className="btn btn-primary">Back to Home</a>
               </div>
             } />

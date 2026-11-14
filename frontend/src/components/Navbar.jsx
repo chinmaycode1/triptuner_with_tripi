@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Plane, Search, Globe, Sun, Moon, Menu, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
@@ -59,7 +60,7 @@ export default function Navbar({ onAuthOpen, language, onLanguageChange }) {
     { to: '/', label: 'Home' },
     { to: '/destinations', label: 'Destinations' },
     { to: '/itineraries', label: 'Itineraries' },
-    { to: '/tripi', label: '🤖 Tripi AI' },
+    { to: '/tripi', label: 'Tripi AI' },
     { to: '/plan', label: 'Plan Trip' },
     { to: '/near-me', label: 'Near Me' },
     { to: '/saved', label: 'Saved Trips' },
@@ -72,7 +73,7 @@ export default function Navbar({ onAuthOpen, language, onLanguageChange }) {
       <nav className={`navbar ${scrolled ? 'navbar-scrolled' : ''}`} role="navigation" aria-label="Main navigation">
         <div className="navbar-inner">
           <Link to="/" className="navbar-logo" aria-label="TripTuner Home">
-            <span className="logo-icon">✈️</span>
+            <Plane className="logo-icon" size={24} />
             <span className="logo-text">TripTuner</span>
           </Link>
 
@@ -96,12 +97,12 @@ export default function Navbar({ onAuthOpen, language, onLanguageChange }) {
               aria-label="Search (Ctrl+K)"
               title="Search (Ctrl+K)"
             >
-              🔍
+              <Search size={18} />
             </button>
 
             <div className="lang-dropdown" role="combobox" aria-expanded={langOpen}>
               <button className="nav-icon-btn lang-btn" onClick={() => setLangOpen(!langOpen)} aria-label="Select language">
-                🌐 <span className="lang-label hide-mobile">{currentLang.label}</span>
+                <Globe size={18} /> <span className="lang-label hide-mobile">{currentLang.label}</span>
               </button>
               {langOpen && (
                 <ul className="lang-menu" role="listbox">
@@ -124,7 +125,7 @@ export default function Navbar({ onAuthOpen, language, onLanguageChange }) {
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
             {user ? (
@@ -151,7 +152,7 @@ export default function Navbar({ onAuthOpen, language, onLanguageChange }) {
               aria-label="Toggle menu"
               aria-expanded={menuOpen}
             >
-              {menuOpen ? '✕' : '☰'}
+              {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>

@@ -1,43 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Search, MapPin, Calendar, Users } from 'lucide-react';
 import { getFeaturedDestinations } from '../data/destinations';
 import DestinationCard from '../components/DestinationCard';
 import './Home.css';
 
-function useCounter(target, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let startTime = null;
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, start]);
-  return count;
-}
-
 export default function Home({ onAuthOpen }) {
   const navigate = useNavigate();
   const [form, setForm] = useState({ destination: '', members: 'Solo', duration: '5' });
-  const [statsVisible, setStatsVisible] = useState(false);
   const [generatedItinerary, setGeneratedItinerary] = useState(null);
-  const statsRef = useRef(null);
-
-  const destinations500 = useCounter(500, 2000, statsVisible);
-  const trips50k = useCounter(50000, 2000, statsVisible);
-  const satisfaction = useCounter(98, 1500, statsVisible);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setStatsVisible(true);
-    }, { threshold: 0.3 });
-    if (statsRef.current) observer.observe(statsRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -51,7 +22,6 @@ export default function Home({ onAuthOpen }) {
 
   const handleItineraryGenerate = (itineraryData) => {
     setGeneratedItinerary(itineraryData);
-    // Scroll to itinerary section
     setTimeout(() => {
       document.getElementById('generated-itinerary')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
@@ -59,32 +29,25 @@ export default function Home({ onAuthOpen }) {
 
   return (
     <main className="home-page">
-      {/* Hero */}
       <section className="hero" aria-label="Hero section">
-        <div className="hero-orbs" aria-hidden="true">
-          <div className="orb orb-1" />
-          <div className="orb orb-2" />
-          <div className="orb orb-3" />
-        </div>
         <div className="hero-content container">
-          <div className="badge hero-badge">🤖 Powered by Tripi AI</div>
-          <h1 className="hero-title">
-            Tune Your Perfect<br />
-            <span className="gradient-text">India Adventure</span>
-          </h1>
+          <h1 className="hero-title">Plan Your India Trip with AI</h1>
           <p className="hero-subtitle">
-            Plan epic Indian trips with AI-powered itineraries, real rupee budgets, and insider tips from Tripi — your personal India travel expert.
+            Generate custom itineraries with real budgets in Indian rupees, destination guides for 30+ locations, and AI chat support in 8 Indian languages.
           </p>
 
           <form className="hero-search" onSubmit={handleSearch} role="search" aria-label="Trip search">
-            <input
-              type="text"
-              className="hero-search-input"
-              placeholder="Where in India? (Goa, Ladakh, Kerala...)"
-              value={form.destination}
-              onChange={e => setForm({...form, destination: e.target.value})}
-              aria-label="Destination"
-            />
+            <div className="search-input-wrapper">
+              <MapPin size={20} className="search-icon" />
+              <input
+                type="text"
+                className="hero-search-input"
+                placeholder="Destination (e.g., Goa, Ladakh, Kerala)"
+                value={form.destination}
+                onChange={e => setForm({...form, destination: e.target.value})}
+                aria-label="Destination"
+              />
+            </div>
             <select
               className="hero-search-select"
               value={form.members}
@@ -108,41 +71,17 @@ export default function Home({ onAuthOpen }) {
               ))}
             </select>
             <button type="submit" className="btn btn-primary hero-search-btn">
-              🔍 Explore with Tripi
+              <Search size={18} />
+              Plan Trip
             </button>
           </form>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="stats-section" ref={statsRef} aria-label="Platform statistics">
-        <div className="container">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-number">{destinations500}+</div>
-              <div className="stat-label">Destinations</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">{trips50k.toLocaleString('en-IN')}+</div>
-              <div className="stat-label">Trips Planned</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">₹999</div>
-              <div className="stat-label">Avg Budget/Day</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-number">{satisfaction}%</div>
-              <div className="stat-label">Satisfaction</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Destinations */}
       <section className="section featured-section" aria-label="Featured destinations">
         <div className="container">
-          <h2 className="section-title">✨ Featured Destinations</h2>
-          <p className="section-subtitle">Handpicked by Tripi AI for unforgettable experiences</p>
+          <h2 className="section-title">Featured Destinations</h2>
+          <p className="section-subtitle">Explore popular destinations across India with AI-generated itineraries</p>
           <div className="grid-3">
             {featured.map(dest => (
               <DestinationCard key={dest.id} destination={dest} onItineraryGenerate={handleItineraryGenerate} />
@@ -150,20 +89,19 @@ export default function Home({ onAuthOpen }) {
           </div>
           <div className="view-all-row">
             <button className="btn btn-secondary" onClick={() => navigate('/destinations')}>
-              View All 500+ Destinations →
+              View All Destinations
             </button>
           </div>
         </div>
       </section>
 
-      {/* Generated Itinerary Section */}
       {generatedItinerary && (
         <section id="generated-itinerary" className="section itinerary-result-section" aria-label="Generated itinerary">
           <div className="container">
             <div className="itinerary-result-card">
               <div className="itinerary-header">
                 <div>
-                  <h2 className="section-title">✨ Your {generatedItinerary.destination} Itinerary</h2>
+                  <h2 className="section-title">{generatedItinerary.destination} Itinerary</h2>
                   <p className="section-subtitle">{generatedItinerary.duration} days • {generatedItinerary.category} • ₹{generatedItinerary.budget.toLocaleString('en-IN')} total</p>
                 </div>
                 <button 
@@ -171,7 +109,7 @@ export default function Home({ onAuthOpen }) {
                   onClick={() => setGeneratedItinerary(null)}
                   aria-label="Close itinerary"
                 >
-                  ✕
+                  &times;
                 </button>
               </div>
               
@@ -180,6 +118,9 @@ export default function Home({ onAuthOpen }) {
               )}
               
               <div className="itinerary-content">
+                <p className="ai-disclaimer">
+                  <strong>AI-generated content:</strong> This itinerary was created by AI. Verify all prices, schedules, and details before booking.
+                </p>
                 <div 
                   className="itinerary-text"
                   dangerouslySetInnerHTML={{ 
@@ -203,7 +144,7 @@ export default function Home({ onAuthOpen }) {
                     }
                   }}
                 >
-                  💾 Save Trip
+                  Save Trip
                 </button>
                 <button 
                   className="btn btn-secondary"
@@ -216,7 +157,6 @@ export default function Home({ onAuthOpen }) {
                       duration: `${generatedItinerary.duration} Days`,
                       groupSize: '2 people',
                       category: generatedItinerary.category,
-                      emoji: '✈️',
                       description: `A ${generatedItinerary.duration}-day trip to ${generatedItinerary.destination}`,
                       budgetTotal: { mid: generatedItinerary.budget },
                       budgetPerPerson: { mid: Math.round(generatedItinerary.budget / 2) },
@@ -224,19 +164,19 @@ export default function Home({ onAuthOpen }) {
                     });
                   }}
                 >
-                  📄 Download PDF
+                  Download PDF
                 </button>
                 <button 
                   className="btn btn-secondary"
                   onClick={() => navigate(`/tripi?q=Tell me more about ${generatedItinerary.destination}`)}
                 >
-                  💬 Chat with Tripi
+                  Chat with Tripi
                 </button>
                 <button 
                   className="btn btn-secondary"
                   onClick={() => navigate(`/plan?destination=${generatedItinerary.destination}`)}
                 >
-                  ✏️ Customize Trip
+                  Customize Trip
                 </button>
               </div>
             </div>
@@ -244,23 +184,21 @@ export default function Home({ onAuthOpen }) {
         </section>
       )}
 
-      {/* Tripi CTA */}
       <section className="tripi-cta-section section" aria-label="Tripi AI call to action">
         <div className="container">
           <div className="tripi-cta-card">
             <div className="tripi-cta-content">
-              <div className="tripi-cta-avatar">🧭</div>
               <div>
-                <h2>Meet Tripi — Your AI Travel Architect</h2>
-                <p>Get personalized itineraries, real rupee budgets, train routes, hotel recommendations and insider tips for any destination in India. Available 24/7 in 8 Indian languages.</p>
+                <h2>Chat with Tripi for Custom Plans</h2>
+                <p>Ask Tripi to generate personalized itineraries, estimate budgets in Indian rupees, suggest train routes, recommend hotels, and answer questions about any destination in India. Available in 8 Indian languages.</p>
                 <div className="tripi-cta-features">
-                  <span>✅ Real rupee prices</span>
-                  <span>✅ Day-by-day itineraries</span>
-                  <span>✅ Train & flight routes</span>
-                  <span>✅ 8 Indian languages</span>
+                  <span>Real rupee pricing</span>
+                  <span>Day-by-day plans</span>
+                  <span>Transport routes</span>
+                  <span>8 languages</span>
                 </div>
                 <button className="btn btn-primary" onClick={() => navigate('/tripi')}>
-                  Chat with Tripi →
+                  Start Chat
                 </button>
               </div>
             </div>

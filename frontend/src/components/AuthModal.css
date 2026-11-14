@@ -1,7 +1,8 @@
 .modal-overlay { position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:24px; }
 .modal-bg { position:absolute;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px); }
-.modal-content { position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);padding:40px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:fadeIn 0.3s ease; }
-.modal-close { position:absolute;top:16px;right:16px;background:var(--card2);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center; }
+.modal-content { position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:40px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:fadeIn 0.3s ease; }
+.modal-close { position:absolute;top:16px;right:16px;background:var(--card2);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:20px;color:var(--text2);display:flex;align-items:center;justify-content:center; }
+.modal-close:hover { background:var(--bg3); }
 .modal-header { text-align:center;margin-bottom:24px; }
 .modal-header h2 { font-size:24px;font-weight:800;margin-bottom:6px; }
 .modal-header p { color:var(--text2);font-size:14px; }
@@ -12,3 +13,7 @@
 .field-error { font-size:12px;color:var(--red);margin-top:4px;display:block; }
 .modal-submit { width:100%;justify-content:center;margin-top:8px; }
 .google-btn { width:100%;justify-content:center;margin-top:8px; }
+.terms-notice { font-size:13px;color:var(--text2);line-height:1.5;margin-top:12px;margin-bottom:16px; }
+.terms-notice a { color:var(--primary);text-decoration:underline; }
+.terms-notice a:hover { color:var(--primary-hover); }
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}

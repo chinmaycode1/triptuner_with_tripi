@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { showToast } from './Toast';
 import './AuthModal.css';
@@ -34,7 +35,7 @@ export default function AuthModal({ mode, onClose }) {
           }
           throw error;
         }
-        showToast('Welcome back! 🎉', 'success');
+        showToast('Welcome back', 'success');
         onClose();
       } else {
         const { data, error } = await signUp(form.email, form.password, form.fullName);
@@ -45,11 +46,10 @@ export default function AuthModal({ mode, onClose }) {
           throw error;
         }
         
-        // Check if email confirmation is required
         if (data?.user && !data.session) {
-          showToast('Account created! Please check your email to verify your account. ✅', 'success');
+          showToast('Account created. Please check your email to verify your account.', 'success');
         } else {
-          showToast('Account created and logged in! 🎉', 'success');
+          showToast('Account created and logged in', 'success');
         }
         onClose();
       }
@@ -69,10 +69,10 @@ export default function AuthModal({ mode, onClose }) {
     <div className="modal-overlay" role="dialog" aria-modal="true" aria-label="Authentication">
       <div className="modal-bg" onClick={onClose} />
       <div className="modal-content">
-        <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <button className="modal-close" onClick={onClose} aria-label="Close">&times;</button>
 
         <div className="modal-header">
-          <h2>✈️ TripTuner</h2>
+          <h2>TripTuner</h2>
           <p>Plan your perfect India adventure</p>
         </div>
 
@@ -99,8 +99,15 @@ export default function AuthModal({ mode, onClose }) {
             <input id="password" type="password" className="form-input" placeholder="••••••••" value={form.password} onChange={e => setForm({...form, password: e.target.value})} aria-describedby={errors.password ? 'password-error' : undefined} />
             {errors.password && <span id="password-error" className="field-error" role="alert">{errors.password}</span>}
           </div>
+          
+          {tab === 'signup' && (
+            <p className="terms-notice">
+              By creating an account, you agree to our <Link to="/terms" onClick={onClose}>Terms and Conditions</Link> and <Link to="/privacy" onClick={onClose}>Privacy Policy</Link>.
+            </p>
+          )}
+          
           <button type="submit" className="btn btn-primary modal-submit" disabled={loading}>
-            {loading ? '⏳ Please wait...' : tab === 'login' ? '🚀 Log In' : '✨ Create Account'}
+            {loading ? 'Please wait...' : tab === 'login' ? 'Log In' : 'Create Account'}
           </button>
         </form>
       </div>

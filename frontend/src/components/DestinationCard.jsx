@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import { getBudgetClass } from '../data/destinations';
 import { generateTrip } from '../lib/api';
 import { generateItineraryPDF } from '../lib/enhancedPdf';
@@ -96,7 +97,7 @@ export default function DestinationCard({ destination, skeleton = false, onItine
     >
       <div className="dest-card-image-area">
         <img src={image} alt={name} className="dest-image" loading="lazy" />
-        {inSeason && <span className="season-badge" title="Great time to visit!">🌟 In Season</span>}
+        {inSeason && <span className="season-badge" title="Great time to visit">In Season</span>}
       </div>
       <div className="dest-card-body">
         <div className="dest-card-header">
@@ -110,13 +111,20 @@ export default function DestinationCard({ destination, skeleton = false, onItine
           </span>
           <span className="tag">{category[0]}</span>
         </div>
-        <div className="dest-best-time">🗓️ Best: {best_time}</div>
+        <div className="dest-best-time">Best: {best_time}</div>
         <button 
           className="btn btn-primary dest-plan-btn"
           onClick={handleGenerateItinerary}
           disabled={generating}
         >
-          {generating ? '⏳ Generating...' : '✨ Get Itinerary'}
+          {generating ? (
+            <>Generating...</>
+          ) : (
+            <>
+              <Sparkles size={16} />
+              Get Itinerary
+            </>
+          )}
         </button>
       </div>
     </article>

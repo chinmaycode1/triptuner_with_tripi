@@ -7,12 +7,13 @@
 ## ✨ Features
 
 - 🤖 **Tripi AI Assistant** - Intelligent travel planning with Gemini 2.5 Flash
-- 🗺️ **500+ Destinations** - Comprehensive India travel database
+- 🗺️ **30+ Destinations** - Curated India travel database with featured locations
 - 💾 **PDF Trip Storage** - Save itineraries as professional PDFs
 - 📱 **Mobile Responsive** - Perfect experience on all devices
 - 🌍 **Near Me Feature** - Location-based destination discovery
 - 💰 **Real Budget Planning** - Accurate INR costs and breakdowns
 - 🔐 **Secure Authentication** - Supabase Auth integration
+- 🌐 **Multi-language Support** - Available in 8 Indian languages
 
 ## 🚀 Quick Start
 

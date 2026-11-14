@@ -11,21 +11,21 @@ import { generateItineraryPDF } from '../lib/enhancedPdf';
 import './TripiChat.css';
 
 const QUICK_PROMPTS = [
-  { label: '🏖️ Goa 5 days', query: 'Plan a 5-day trip to Goa for a couple with beaches and nightlife' },
-  { label: '🏔️ Ladakh 7 days', query: 'Plan a 7-day Ladakh trip from Delhi with budget breakdown' },
-  { label: '🛶 Kerala 6 days', query: 'Plan a 6-day Kerala backwaters and hill station trip' },
-  { label: '🏰 Rajasthan 9 days', query: 'Plan a 9-day Rajasthan royal circuit Jaipur Jodhpur Jaisalmer Udaipur' },
-  { label: '🧘 Rishikesh 3 days', query: 'Plan a 3-day spiritual and adventure trip to Rishikesh' },
-  { label: '🌿 Coorg weekend', query: 'Plan a 2-day weekend trip to Coorg from Bangalore' },
+  { label: 'Goa 5 days', query: 'Plan a 5-day trip to Goa for a couple with beaches and nightlife' },
+  { label: 'Ladakh 7 days', query: 'Plan a 7-day Ladakh trip from Delhi with budget breakdown' },
+  { label: 'Kerala 6 days', query: 'Plan a 6-day Kerala backwaters and hill station trip' },
+  { label: 'Rajasthan 9 days', query: 'Plan a 9-day Rajasthan royal circuit Jaipur Jodhpur Jaisalmer Udaipur' },
+  { label: 'Rishikesh 3 days', query: 'Plan a 3-day spiritual and adventure trip to Rishikesh' },
+  { label: 'Coorg weekend', query: 'Plan a 2-day weekend trip to Coorg from Bangalore' },
 ];
 
 const NAMASTE_RESPONSES = {
-  en: "🙏 Namaste! I'm Tripi, your AI Travel Architect for India! I'm so happy you greeted me in the traditional Indian way. How can I help you plan your perfect India adventure today?",
-  hi: "🙏 नमस्ते! मैं Tripi हूँ, आपका AI Travel Architect! आपने मुझे पारंपरिक भारतीय तरीके से अभिवादन किया, यह बहुत अच्छा लगा! आज मैं आपकी भारत यात्रा की योजना बनाने में कैसे मदद कर सकता हूँ?",
-  ta: "🙏 வணக்கம்! நான் Tripi, உங்கள் AI பயண வடிவமைப்பாளர்! இந்திய பாரம்பரிய வழியில் வாழ்த்தியதற்கு நன்றி! இன்று உங்கள் இந்தியப் பயணத்தை திட்டமிட நான் எப்படி உதவலாம்?",
-  te: "🙏 నమస్కారం! నేను Tripi, మీ AI ట్రావెల్ ఆర్కిటెక్ట్! సంప్రదాయ భారతీయ పద్ధతిలో నన్ను పలకరించినందుకు ధన్యవాదాలు! ఈరోజు మీ భారత్ యాత్రను ప్లాన్ చేయడంలో నేను ఎలా సహాయపడగలను?",
-  bn: "🙏 নমস্কার! আমি Tripi, আপনার AI ট্রাভেল আর্কিটেক্ট! ঐতিহ্যবাহী ভারতীয় পদ্ধতিতে অভিবাদন জানানোর জন্য ধন্যবাদ! আজ আপনার ভারত ভ্রমণ পরিকল্পনায় আমি কীভাবে সাহায্য করতে পারি?",
-  mr: "🙏 नमस्कार! मी Tripi आहे, तुमचा AI Travel Architect! पारंपारिक भारतीय पद्धतीने अभिवादन केल्याबद्दल धन्यवाद! आज मी तुमच्या भारत प्रवासाची योजना करण्यात कशी मदत करू शकतो?",
+  en: "Namaste! I'm Tripi, your AI travel assistant for India. I'm happy you greeted me in the traditional Indian way. How can I help you plan your India adventure today?",
+  hi: "नमस्ते! मैं Tripi हूँ, आपका AI Travel Architect। आपने मुझे पारंपरिक भारतीय तरीके से अभिवादन किया, यह बहुत अच्छा लगा। आज मैं आपकी भारत यात्रा की योजना बनाने में कैसे मदद कर सकता हूँ?",
+  ta: "வணக்கம்! நான் Tripi, உங்கள் AI பயண வடிவமைப்பாளர். இந்திய பாரம்பரிய வழியில் வாழ்த்தியதற்கு நன்றி। இன்று உங்கள் இந்தியப் பயணத்தை திட்டமிட நான் எப்படி உதவலாம்?",
+  te: "నమస్కారం! నేను Tripi, మీ AI ట్రావెల్ ఆర్కిటెక్ట్। సంప్రదాయ భారతీయ పద్ధతిలో నన్ను పలకరించినందుకు ధన్యవాదాలు। ఈరోజు మీ భారత్ యాత్రను ప్లాన్ చేయడంలో నేను ఎలా సహాయపడగలను?",
+  bn: "নমস্কার! আমি Tripi, আপনার AI ট্রাভেল আর্কিটেক্ট। ঐতিহ্যবাহী ভারতীয় পদ্ধতিতে অভিবাদন জানানোর জন্য ধন্যবাদ। আজ আপনার ভারত ভ্রমণ পরিকল্পনায় আমি কীভাবে সাহায্য করতে পারি?",
+  mr: "नमस्कार! मी Tripi आहे, तुमचा AI Travel Architect। पारंपारिक भारतीय पद्धतीने अभिवादन केल्याबद्दल धन्यवाद। आज मी तुमच्या भारत प्रवासाची योजना करण्यात कशी मदत करू शकतो?",
 };
 
 export default function TripiChat({ initialQuery = '', language = 'en', conversationId: propConversationId = null }) {
@@ -34,7 +34,7 @@ export default function TripiChat({ initialQuery = '', language = 'en', conversa
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "🙏 Namaste! I'm **Tripi** — Your AI Travel Architect for India! ✈️\n\nI can help you plan any trip across India's 28 states and 8 union territories. Ask me about destinations, budgets, itineraries, train routes, local food, festivals, or anything India travel!\n\nWhat adventure shall we plan today? 🗺️"
+      content: "Namaste! I'm Tripi, your AI travel assistant for India.\n\nI can help you plan trips across India's 28 states and 8 union territories. Ask me about destinations, budgets, itineraries, train routes, local food, festivals, or anything India travel.\n\nWhat would you like to plan today?"
     }
   ]);
   const [input, setInput] = useState('');

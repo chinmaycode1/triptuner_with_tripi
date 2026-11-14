@@ -79,7 +79,7 @@ export const itineraries = [
     highlights: ["Baga Beach parties", "Old Goa churches", "Dudhsagar Falls", "Anjuna flea market", "Sunset at Vagator"],
     budgetTotal: { budget: 12000, mid: 22000, premium: 50000 },
     budgetPerPerson: { budget: 6000, mid: 11000, premium: 25000 },
-    description: "Sun, sand, seafood and culture — the perfect Goa beach holiday covering both North and South Goa.",
+    description: "Sun, sand, seafood and culture: the perfect Goa beach holiday covering both North and South Goa.",
     days: []
   },
   {
@@ -109,7 +109,7 @@ export const itineraries = [
     highlights: ["Living root bridges", "Nohkalikai Falls", "Rhino safari Kaziranga", "Dawki river", "Mawlynnong village"],
     budgetTotal: { budget: 22000, mid: 40000, premium: 75000 },
     budgetPerPerson: { budget: 11000, mid: 20000, premium: 37500 },
-    description: "Explore India's magical northeast — the wettest place on Earth, living root bridges and one-horned rhinos.",
+    description: "Explore India's magical northeast: the wettest place on Earth, living root bridges and one-horned rhinos.",
     days: []
   },
   {
@@ -154,7 +154,7 @@ export const itineraries = [
     highlights: ["Kedarnath Temple trek", "Gangotri Glacier", "Badrinath darshan", "Yamunotri hot springs", "Haridwar Ganga Aarti"],
     budgetTotal: { budget: 30000, mid: 55000, premium: 110000 },
     budgetPerPerson: { budget: 15000, mid: 27500, premium: 55000 },
-    description: "The sacred pilgrimage to all four holy shrines in the Himalayas — a journey of a lifetime for devotees.",
+    description: "The sacred pilgrimage to all four holy shrines in the Himalayas: a journey of a lifetime for devotees.",
     days: []
   },
   {

@@ -7,11 +7,8 @@ export default function Footer() {
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
-            <div className="footer-logo">✈️ TripTuner</div>
-            <p className="footer-tagline">India's AI-powered travel planning platform. Plan your perfect Indian adventure with Tripi AI.</p>
-            <div className="footer-badges">
-              <span className="badge">🤖 Powered by Tripi AI</span>
-            </div>
+            <div className="footer-logo">TripTuner</div>
+            <p className="footer-tagline">AI-powered travel planning for India. Plan trips with generated itineraries, real rupee budgets, and destination guides.</p>
           </div>
           <div className="footer-col">
             <h4>Explore</h4>
@@ -23,7 +20,7 @@ export default function Footer() {
             </ul>
           </div>
           <div className="footer-col">
-            <h4>AI Features</h4>
+            <h4>Features</h4>
             <ul>
               <li><Link to="/tripi">Chat with Tripi</Link></li>
               <li><Link to="/plan">Trip Builder</Link></li>
@@ -32,18 +29,16 @@ export default function Footer() {
             </ul>
           </div>
           <div className="footer-col">
-            <h4>Popular Routes</h4>
+            <h4>Legal</h4>
             <ul>
-              <li><Link to="/tripi?q=Golden Triangle 7 days">Golden Triangle</Link></li>
-              <li><Link to="/tripi?q=Kerala backwaters 5 days">Kerala Backwaters</Link></li>
-              <li><Link to="/tripi?q=Ladakh trip 7 days">Ladakh Circuit</Link></li>
-              <li><Link to="/tripi?q=Rajasthan royal tour">Rajasthan Royal</Link></li>
+              <li><Link to="/privacy">Privacy Policy</Link></li>
+              <li><Link to="/terms">Terms and Conditions</Link></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p>© 2025 TripTuner. Made with ❤️ for India 🇮🇳</p>
-          <p className="footer-disclaimer">AI responses are for planning purposes. Always verify current prices and conditions.</p>
+          <p>&copy; 2025 TripTuner. Open source under MIT License.</p>
+          <p className="footer-disclaimer">AI-generated itineraries are for planning purposes only. Always verify prices, schedules, and travel conditions before booking.</p>
         </div>
       </div>
     </footer>
